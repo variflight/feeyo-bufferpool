@@ -36,8 +36,7 @@ public class LeakTrackingBufferPool extends BufferPool {
 
 	public LeakTrackingBufferPool(BufferPool delegate) {
 		//
-		super(delegate.getMinBufferSize(), delegate.getMaxBufferSize(), delegate.getDecomposeBufferSize(),  //
-				delegate.getMinChunkSize(), delegate.getIncrements(), delegate.getMaxChunkSize());
+		super(delegate.getMinBufferSize(), delegate.getMaxBufferSize(), delegate.getChunkSizes());
 		this.delegate = delegate;
 		//
 		// -------------------Start & Stop leakDetector --------------------

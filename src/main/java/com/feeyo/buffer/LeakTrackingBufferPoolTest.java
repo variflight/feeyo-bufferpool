@@ -9,8 +9,7 @@ public class LeakTrackingBufferPoolTest {
 	public static void main(String[] args) {
 		
 		//
-		BufferPool bufferPool = new BucketBufferPool(1024 * 2, 1024 * 5,  512, 1024,
-				new int[] { 512, 1024 }, 1024);
+		BufferPool bufferPool = new BucketBufferPool(1024 * 2, 1024 * 5,new int[] { 512, 1024 });
 		
 		LeakTrackingBufferPool x = new LeakTrackingBufferPool(bufferPool);
 		

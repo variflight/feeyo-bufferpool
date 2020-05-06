@@ -3,14 +3,14 @@ package com.feeyo.buffer.bucket;
 import java.nio.ByteBuffer;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import com.feeyo.buffer.BufferPool;
+
 public class DefaultBucket extends AbstractBucket {
 	
 	private final ConcurrentLinkedQueue<ByteBuffer> queue = new ConcurrentLinkedQueue<ByteBuffer>();
 
-	public DefaultBucket(BucketBufferPool pool, int chunkSize,
-                         int count, boolean isExpand) {
-		super(pool, chunkSize, count, isExpand);
-
+	public DefaultBucket(BufferPool pool, int chunkSize, int count) {
+		super(pool, chunkSize, count);
 		// 初始化
 		for(int j = 0; j < count; j++ ) {
 			queueOffer( ByteBuffer.allocateDirect(chunkSize) );
@@ -47,5 +47,4 @@ public class DefaultBucket extends AbstractBucket {
 	public int getQueueSize() {
 		return this.queue.size();
 	}
-
 }

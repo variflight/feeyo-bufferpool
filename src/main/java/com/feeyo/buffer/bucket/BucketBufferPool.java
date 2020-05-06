@@ -25,48 +25,21 @@ public class BucketBufferPool extends BufferPool {
 	
 	private long sharedOptsCount;
 	
-	public BucketBufferPool(long minBufferSize, long maxBufferSize, int decomposeBufferSize,
-			int minChunkSize, int[] increments, int maxChunkSize) {
+	public BucketBufferPool(long minBufferSize, long maxBufferSize, int[] chunkSizes) {
 		
-		super(minBufferSize, maxBufferSize, decomposeBufferSize, minChunkSize, increments, maxChunkSize);
+		super(minBufferSize, maxBufferSize, chunkSizes);
 		//
-		int bucketCount;
-		if (increments.length > 1) {
-			bucketCount = increments.length;
-		} else {
-			bucketCount = maxChunkSize / increments[0];
-		}
-		
 		this._buckets = new ArrayList<AbstractBucket>();
-		
-		// 平均分配初始化的桶size 
-		long bucketBufferSize = minBufferSize / bucketCount;
-		
-		// 初始化桶 
-		int chunkSize = 0;
-		for (int i = 0; i < bucketCount; i++) {
+		//
+		// 初始化桶
+		long bucketCapacity = minBufferSize / chunkSizes.length;
+		for (int i = 0; i < chunkSizes.length; i++) {
+			int chunkSize = chunkSizes[i];
+			int chunkCount = (int) (bucketCapacity / chunkSize);
 			//
-			if ( increments.length > 1 ) {
-				chunkSize = increments[i];
-			} else {
-				chunkSize += increments[0];
-			}
-			
-			
-			int chunkCount = (int) (bucketBufferSize / chunkSize);
-			boolean isExpand = (chunkSize <= 2097152); 	// 2MB内的块 支持自动扩容
-			//
-			// 测试结果 队列长度2048的时候效果就没那么显著了。
-			AbstractBucket bucket;
-			if (chunkCount > 2000) {
-				bucket = new ArrayBucket(this, chunkSize, chunkCount, isExpand);
-			} else {
-				bucket = new DefaultBucket(this, chunkSize, chunkCount, isExpand);
-			}
-
+			AbstractBucket bucket = new ArrayBucket(this, chunkSize, chunkCount);
 			this._buckets.add(i, bucket);
 		}
-
 	}
 	
 	//根据size寻找 桶
@@ -145,11 +118,6 @@ public class BucketBufferPool extends BufferPool {
 	@Override
 	public long size() {
 		return this.usedBufferSize.get();
-	}
-
-	@Override
-	public int getChunkSize() {
-		return this.getMinChunkSize();
 	}
 
 	@Override

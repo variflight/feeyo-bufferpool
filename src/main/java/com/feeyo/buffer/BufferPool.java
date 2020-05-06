@@ -1,6 +1,7 @@
 package com.feeyo.buffer;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -8,57 +9,28 @@ import java.util.concurrent.atomic.AtomicLong;
  * 缓冲池
  */
 public abstract class BufferPool {
-	
 	//
 	protected long minBufferSize;
 	protected long maxBufferSize;
 	protected AtomicLong usedBufferSize = new AtomicLong(0); 
 	
 	protected int minChunkSize;
-	protected int[] increments;
+	protected int[] chunkSizes;
 	protected int maxChunkSize;
-	protected int decomposeBufferSize;	// 用于大buffer 分解
+	protected int decomposeBufferSize = 64 * 1024;	// 用于大buffer 分解
 	
-	public BufferPool(long minBufferSize, long maxBufferSize, int decomposeBufferSize, 
-			int minChunkSize, int[] increments, int maxChunkSize) {
-		
+	public BufferPool(long minBufferSize, long maxBufferSize, int[] chunkSizes) {
 		this.minBufferSize = minBufferSize;
 		this.maxBufferSize = maxBufferSize;
-		this.decomposeBufferSize = decomposeBufferSize;
-		
-		if (minChunkSize <= 0)
-			minChunkSize = 0;
-		
-		for (int increment : increments) {
-			if (increment <= 0)
-				increment = 1024;
-		}
-		
-		if (maxChunkSize <= 0) {
-			maxChunkSize = 64 * 1024;
-		}
-		
-		if ( decomposeBufferSize <= 0 ) {
-			decomposeBufferSize = 64 * 1024;
-		}
-		
 		//
-		// 均值增加 pool
-		if (increments.length == 1) {
-			
-			//最小 size不能大于增量
-			int increment = increments[0];
-			if (minChunkSize > increment)
-				throw new IllegalArgumentException("minChunkSize >= increment");
-			
-			//最大size 必须是增量的整数倍，并且增量不能大于最大的size
-			if ((maxChunkSize % increment) != 0 || increment >= maxChunkSize)
-				throw new IllegalArgumentException("increment must be a divisor of maxChunkSize");
-		} 
-		
-		this.minChunkSize = minChunkSize;
-		this.increments = increments;
-		this.maxChunkSize = maxChunkSize;
+		if ( chunkSizes == null || chunkSizes.length ==0 )
+			throw new IllegalArgumentException("chunkSizes cannot be empty!");
+		//
+		Arrays.sort( chunkSizes );
+		//
+		this.chunkSizes = chunkSizes;
+		this.minChunkSize = chunkSizes[0];
+		this.maxChunkSize = chunkSizes[ chunkSizes.length - 1 ];
 	}
 	
 	public long getMinBufferSize() {
@@ -78,23 +50,17 @@ public abstract class BufferPool {
 	}
 	
 	public int getMinChunkSize() {
-		if( minChunkSize <= 0 ) 
-			return increments[0];
 		return minChunkSize;
 	}
 	
-	public int[] getIncrements() {
-		return increments;
+	public int[] getChunkSizes() {
+		return chunkSizes;
 	}
 
 	public int getMaxChunkSize() {
 		return maxChunkSize;
 	}
-	
-    public int getChunkSize() {
-    	return this.getMinChunkSize();
-    }
-	
+
 	//
     public abstract ByteBuffer allocate(int size);
     public abstract void recycle(ByteBuffer theBuf);

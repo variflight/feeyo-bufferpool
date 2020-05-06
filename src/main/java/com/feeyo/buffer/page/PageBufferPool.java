@@ -7,9 +7,9 @@ import com.feeyo.buffer.BufferPool;
 
 public class PageBufferPool extends BufferPool {
 
-	public PageBufferPool(long minBufferSize, long maxBufferSize, int decomposeBufferSize, int minChunkSize,
-			int[] increments, int maxChunkSize) {
-		super(minBufferSize, maxBufferSize, decomposeBufferSize, minChunkSize, increments, maxChunkSize);
+	public PageBufferPool(long minBufferSize, long maxBufferSize, int[] chunkSizes) {
+		
+		super(minBufferSize, maxBufferSize, chunkSizes);
 	}
 
 	@Override

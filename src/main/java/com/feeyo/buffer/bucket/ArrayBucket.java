@@ -4,6 +4,8 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.feeyo.buffer.BufferPool;
+
 public class ArrayBucket extends AbstractBucket {
 	
 	private final ConcurrentLinkedQueue<ByteBuffer>[] queueArray;
@@ -11,9 +13,10 @@ public class ArrayBucket extends AbstractBucket {
 	private final AtomicInteger pollIdx = new AtomicInteger(0);
 	private final AtomicInteger offerIdx = new AtomicInteger(0);
 
+
 	@SuppressWarnings("unchecked")
-	public ArrayBucket(BucketBufferPool pool, int chunkSize, int count, boolean isExpand) {
-		super(pool, chunkSize, count, isExpand);
+	public ArrayBucket(BufferPool pool, int chunkSize, int count) {
+		super(pool, chunkSize, count);
 
 		this.queueArray = new ConcurrentLinkedQueue[16];
 		for (int i = 0; i < queueArray.length; i++) {
@@ -51,25 +54,23 @@ public class ArrayBucket extends AbstractBucket {
 
 	@Override
 	protected void containerClear() {
-		for (ConcurrentLinkedQueue<ByteBuffer> cq : queueArray) {
+		for (ConcurrentLinkedQueue<ByteBuffer> cq : queueArray) 
 			cq.clear();
-		}
 	}
 
 	@Override
 	public int getQueueSize() {
 		int size = 0;
-		for (ConcurrentLinkedQueue<ByteBuffer> cq : queueArray) {
+		for (ConcurrentLinkedQueue<ByteBuffer> cq : queueArray) 
 			size = size + cq.size();
-		}
 		return size;
 	}
 	  
-	private final int getNextIndex(AtomicInteger atomic) {
+	private final int getNextIndex(AtomicInteger atomicValue) {
 		for (;;) {
-			int current = atomic.get();
+			int current = atomicValue.get();
 			int next = current >= 15 ? 0 : current + 1;
-			if (atomic.compareAndSet(current, next))
+			if (atomicValue.compareAndSet(current, next))
 				return current;
 		}
 	}
