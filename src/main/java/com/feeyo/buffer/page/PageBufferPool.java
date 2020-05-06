@@ -18,7 +18,7 @@ public class PageBufferPool extends BufferPool {
 	public PageBufferPool(long minBufferSize, long maxBufferSize, int[] chunkSizes, ByteOrder byteOrder) {
 		super(minBufferSize, maxBufferSize, chunkSizes, byteOrder);
 		//
-		this.pages = new Pages(this.maxBufferSize, this.maxChunkSize, byteOrder);
+		this.pages = new Pages(this.maxBufferSize, this.minChunkSize, byteOrder);
     	this.pages.initialize();
 	}
 
