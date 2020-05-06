@@ -4,9 +4,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class NullBufferPool extends BufferPool {
+public class NonBufferPool extends BufferPool {
 
-	public NullBufferPool(long minBufferSize, long maxBufferSize, int decomposeBufferSize, int minChunkSize,
+	public NonBufferPool(long minBufferSize, long maxBufferSize, int decomposeBufferSize, int minChunkSize,
 			int[] increments, int maxChunkSize) {
 		super(minBufferSize, maxBufferSize, decomposeBufferSize, minChunkSize, increments, maxChunkSize);
 	}
