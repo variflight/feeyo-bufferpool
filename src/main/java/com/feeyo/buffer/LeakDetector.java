@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 public class LeakDetector<T> implements Runnable {
 	
-	private static final Logger LOG = LoggerFactory.getLogger(LeakDetector.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(LeakDetector.class);
 
 	private final ReferenceQueue<T> queue = new ReferenceQueue<>();
 	private final ConcurrentMap<String, LeakInfo> resources = new ConcurrentHashMap<>();
@@ -23,10 +23,10 @@ public class LeakDetector<T> implements Runnable {
 		String id = id(resource);
 		LeakInfo info = resources.putIfAbsent(id, new LeakInfo(resource, id));
 		if (info != null) {
-			// Leak detected, prior acquire exists (not released) or id clash.
+			// 检测到泄漏，先前获取存在（未释放）或id冲突
 			return false;
 		}
-		// Normal behavior.
+		//
 		return true;
 	}
 
@@ -34,11 +34,10 @@ public class LeakDetector<T> implements Runnable {
 		String id = id(resource);
 		LeakInfo info = resources.remove(id);
 		if (info != null) {
-			// Normal behavior.
 			return true;
 		}
 
-		// Leak detected (released without acquire).
+		// 检测到泄漏（未获取即释放）
 		return false;
 	}
 	
@@ -69,8 +68,8 @@ public class LeakDetector<T> implements Runnable {
 			while ( isRunning.get() ) {
 				@SuppressWarnings("unchecked")
 				LeakInfo leakInfo = (LeakInfo) queue.remove();
-				if (LOG.isDebugEnabled())
-					LOG.debug("Resource GC'ed: {}", leakInfo);
+				if (LOGGER.isDebugEnabled())
+					LOGGER.debug("Resource GC'ed: {}", leakInfo);
 				//
 				if (resources.remove(leakInfo.id) != null)
 					leaked(leakInfo);
@@ -81,7 +80,7 @@ public class LeakDetector<T> implements Runnable {
 	}
 
 	protected void leaked(LeakInfo leakInfo) {
-		LOG.warn("Resource leaked: " + leakInfo.description, leakInfo.stackFrames);
+		LOGGER.warn("Resource leaked: " + leakInfo.description, leakInfo.stackFrames);
 	}
 
 	//
