@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class DefaultArrayBucket extends AbstractBucket {
+public class ArrayBucket extends AbstractBucket {
 	
 	private final ConcurrentLinkedQueue<ByteBuffer>[] queueArray;
 	
@@ -12,7 +12,7 @@ public class DefaultArrayBucket extends AbstractBucket {
 	private final AtomicInteger offerIdx = new AtomicInteger(0);
 
 	@SuppressWarnings("unchecked")
-	public DefaultArrayBucket(BucketBufferPool pool, int chunkSize, int count, boolean isExpand) {
+	public ArrayBucket(BucketBufferPool pool, int chunkSize, int count, boolean isExpand) {
 		super(pool, chunkSize, count, isExpand);
 
 		this.queueArray = new ConcurrentLinkedQueue[16];
