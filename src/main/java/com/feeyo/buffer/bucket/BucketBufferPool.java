@@ -20,10 +20,9 @@ import java.util.Map;
 public class BucketBufferPool extends BufferPool {
 	
 	private static Logger LOGGER = LoggerFactory.getLogger( BucketBufferPool.class );
-	
-	private List<AbstractBucket> _buckets;
-	
-	private long sharedOptsCount;
+	//
+	protected List<AbstractBucket> _buckets;
+	protected long sharedOptsCount;
 	
 	public BucketBufferPool(long minBufferSize, long maxBufferSize, int[] chunkSizes) {
 		
@@ -37,9 +36,13 @@ public class BucketBufferPool extends BufferPool {
 			int chunkSize = chunkSizes[i];
 			int chunkCount = (int) (bucketCapacity / chunkSize);
 			//
-			AbstractBucket bucket = new ArrayBucket(this, chunkSize, chunkCount);
-			this._buckets.add(i, bucket);
+			this.initBucket(i, chunkSize, chunkCount);
 		}
+	}
+	
+	protected void initBucket(int index, int chunkSize, int chunkCount) {
+		AbstractBucket bucket = new DefaultBucket(this, chunkSize, chunkCount);
+		this._buckets.add(index, bucket);
 	}
 	
 	//根据size寻找 桶
