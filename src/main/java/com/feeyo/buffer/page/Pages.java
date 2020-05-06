@@ -14,16 +14,16 @@ import org.slf4j.LoggerFactory;
  * @author zhuam
  *
  */
-public class BufferPageArray {
+class Pages {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger( BufferPageArray.class );
+	private static final Logger LOGGER = LoggerFactory.getLogger( Pages.class );
 	//
     public static final int DEFAULT_CHUNK_SIZE = 128;
     public static final int DEFAULT_PAGE_SIZE = 512 * 1024 * 1024;		// 512MB
     //
     protected final long capacity;
 	//
-	protected BufferPage[] allPages;
+	protected ByteBufferPage[] allPages;
     //
     protected AtomicInteger prevAllocatedPage = new AtomicInteger(0);
     protected int pageSize;
@@ -35,7 +35,7 @@ public class BufferPageArray {
     protected AtomicLong sharedOptsCount = new AtomicLong(0);
     
     //
-    public BufferPageArray(long capacity, int chunkSize) {
+    public Pages(long capacity, int chunkSize) {
     	this.capacity = capacity;
     	this.chunkSize = ( chunkSize < DEFAULT_CHUNK_SIZE ? DEFAULT_CHUNK_SIZE : chunkSize );
     	//
@@ -52,9 +52,9 @@ public class BufferPageArray {
     }
 	//
 	public void initialize() {
-    	allPages = new BufferPage[pageCount];
+    	allPages = new ByteBufferPage[pageCount];
     	for (int i = 0; i < pageCount; i++) 
-          allPages[i] = new BufferPage(ByteBuffer.allocateDirect(pageSize), chunkSize);
+          allPages[i] = new ByteBufferPage(ByteBuffer.allocateDirect(pageSize), chunkSize);
 	}
 	
 	public void destroy() {
@@ -125,7 +125,7 @@ public class BufferPageArray {
 		//
 		// 已经使用的地址减去父类最开始的地址，即为所有已经使用的地址，除以chunkSize得到chunk当前开始的地址,得到整块内存开始的地址
 		int startChunk = (int) ((thisNavBuf.address() - parentBuf.address()) / chunkSize);		
-		for (BufferPage pageBuffer : allPages) {
+		for (ByteBufferPage pageBuffer : allPages) {
 			if ((recycled = pageBuffer.recycleByteBuffer((ByteBuffer) parentBuf, theBuf, startChunk, chunkCount))) 
 				break;
 		}

@@ -1,51 +1,56 @@
 package com.feeyo.buffer.page;
 
 import java.nio.ByteBuffer;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.feeyo.buffer.BufferPool;
 
 public class PageBufferPool extends BufferPool {
+	//
+	private final Pages pages;
 
 	public PageBufferPool(long minBufferSize, long maxBufferSize, int[] chunkSizes) {
-		
 		super(minBufferSize, maxBufferSize, chunkSizes);
+		//
+		this.pages = new Pages(this.maxBufferSize, this.maxChunkSize);
+    	this.pages.initialize();
 	}
 
 	@Override
 	public ByteBuffer allocate(int size) {
-		// TODO Auto-generated method stub
-		return null;
+		return pages.allocate(size);
 	}
 
 	@Override
 	public void recycle(ByteBuffer theBuf) {
-		// TODO Auto-generated method stub
-		
+		pages.recycle(theBuf);
 	}
 
 	@Override
 	public long capacity() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.pages.getCapacity();
 	}
 
 	@Override
 	public long size() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.pages.getUsageSize();
 	}
 
 	@Override
 	public long getSharedOptsCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.pages.getSharedOptsCount();
 	}
 
 	@Override
 	public Map<String, Object> getStatistics() {
-		// TODO Auto-generated method stub
-		return null;
+		//
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("buffer.factory.capacity", pages.getCapacity());
+		map.put("buffer.factory.usedSize", pages.getUsageSize());
+		map.put("buffer.factory.usedCnt", pages.getUsageCount());
+		map.put("buffer.factory.sharedCnt", pages.getSharedOptsCount());
+		return map;
 	}
 
 }

@@ -9,7 +9,7 @@ import java.util.BitSet;
  * @author mycat
  * @author zhuam
  */
-public class BufferPage {
+public class ByteBufferPage {
 
 	private ByteBuffer byteBuffer;
 	//
@@ -23,7 +23,7 @@ public class BufferPage {
 	private boolean isRejectAllocate = false;
 
 	//
-	public BufferPage(ByteBuffer byteBuffer, int chunkSize) {
+	public ByteBufferPage(ByteBuffer byteBuffer, int chunkSize) {
 		this.byteBuffer = byteBuffer;
 		this.chunkSize = chunkSize;
 		this.chunkCount = byteBuffer.capacity() / chunkSize;
