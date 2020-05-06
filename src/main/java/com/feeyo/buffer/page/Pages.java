@@ -23,7 +23,7 @@ class Pages {
     //
     protected final long capacity;
 	//
-	protected ByteBufferPage[] allPages;
+	protected BufferPage[] allPages;
     //
     protected AtomicInteger prevAllocatedPage = new AtomicInteger(0);
     protected int pageSize;
@@ -60,9 +60,9 @@ class Pages {
     }
 	//
 	public void initialize() {
-    	allPages = new ByteBufferPage[pageCount];
+    	allPages = new BufferPage[pageCount];
     	for (int i = 0; i < pageCount; i++) 
-          allPages[i] = new ByteBufferPage(ByteBuffer.allocateDirect(pageSize), chunkSize);
+          allPages[i] = new BufferPage(ByteBuffer.allocateDirect(pageSize), chunkSize);
 	}
 	
 	public void destroy() {
@@ -133,7 +133,7 @@ class Pages {
 		//
 		// 已经使用的地址减去父类最开始的地址，即为所有已经使用的地址，除以chunkSize得到chunk当前开始的地址,得到整块内存开始的地址
 		int startChunk = (int) ((thisNavBuf.address() - parentBuf.address()) / chunkSize);		
-		for (ByteBufferPage pageBuffer : allPages) {
+		for (BufferPage pageBuffer : allPages) {
 			if ((recycled = pageBuffer.recycleByteBuffer((ByteBuffer) parentBuf, theBuf, startChunk, chunkCount))) 
 				break;
 		}
