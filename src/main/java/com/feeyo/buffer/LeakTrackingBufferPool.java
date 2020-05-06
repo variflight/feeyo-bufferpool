@@ -1,7 +1,7 @@
 package com.feeyo.buffer;
 
 import java.nio.ByteBuffer;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
@@ -123,7 +123,7 @@ public class LeakTrackingBufferPool extends BufferPool {
 	}
 
 	@Override
-	public ConcurrentHashMap<Long, Long> getNetDirectMemoryUsage() {
-		return delegate.getNetDirectMemoryUsage();
+	public Map<String, Object> getStatistics() {
+		return delegate.getStatistics();
 	}
 }

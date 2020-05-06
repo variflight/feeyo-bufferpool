@@ -1,7 +1,7 @@
 package com.feeyo.buffer;
 
 import java.nio.ByteBuffer;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -18,7 +18,6 @@ public abstract class BufferPool {
 	protected int[] increments;
 	protected int maxChunkSize;
 	protected int decomposeBufferSize;	// 用于大buffer 分解
-	public static final String LOCAL_BUF_THREAD_PREX = "$_";
 	
 	public BufferPool(long minBufferSize, long maxBufferSize, int decomposeBufferSize, 
 			int minChunkSize, int[] increments, int maxChunkSize) {
@@ -96,14 +95,14 @@ public abstract class BufferPool {
     	return this.getMinChunkSize();
     }
 	
-	
+	//
     public abstract ByteBuffer allocate(int size);
     public abstract void recycle(ByteBuffer theBuf);
     
     public abstract long capacity();
     public abstract long size();
     public abstract long getSharedOptsCount();
-    
-    public abstract ConcurrentHashMap<Long,Long> getNetDirectMemoryUsage();
+    //
+    public abstract Map<String, Object> getStatistics();
     
 }

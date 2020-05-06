@@ -7,8 +7,10 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
+
 /**
  * 堆外内存池
  * 
@@ -151,7 +153,23 @@ public class BucketBufferPool extends BufferPool {
 	}
 
 	@Override
-	public ConcurrentHashMap<Long, Long> getNetDirectMemoryUsage() {
-		return null;
+	public Map<String, Object> getStatistics() {
+		//
+		Map<String, Object> map = new HashMap<String,Object>();
+		map.put("buffer.factory.min", this.getMinBufferSize());
+		map.put("buffer.factory.used", this.getUsedBufferSize());
+		map.put("buffer.factory.max", this.getMaxBufferSize());
+		//
+		for (AbstractBucket b: _buckets) {
+			StringBuffer sBuffer = new StringBuffer();
+			sBuffer.append(" chunkSize=").append( b.getChunkSize() ).append(",");
+			sBuffer.append(" queueSize=").append( b.getQueueSize() ).append( ", " );
+			sBuffer.append(" count=").append( b.getCount() ).append( ", " );
+			sBuffer.append(" useCount=").append( b.getUsedCount() ).append( ", " );
+			sBuffer.append(" shared=").append( b.getShared() );		
+			//
+			map.put("buffer.factory.bucket." + b.getChunkSize(),  sBuffer.toString());
+		}
+		return map;
 	}
 }
