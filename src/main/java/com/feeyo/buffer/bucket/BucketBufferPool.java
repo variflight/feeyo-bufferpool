@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,8 +26,12 @@ public class BucketBufferPool extends BufferPool {
 	protected long sharedOptsCount;
 	
 	public BucketBufferPool(long minBufferSize, long maxBufferSize, int[] chunkSizes) {
+		this(minBufferSize, maxBufferSize, chunkSizes, ByteOrder.BIG_ENDIAN);
+	}
+	
+	public BucketBufferPool(long minBufferSize, long maxBufferSize, int[] chunkSizes, ByteOrder byteOrder) {
 		
-		super(minBufferSize, maxBufferSize, chunkSizes);
+		super(minBufferSize, maxBufferSize, chunkSizes, byteOrder);
 		//
 		this._buckets = new ArrayList<AbstractBucket>();
 		//
@@ -42,13 +47,13 @@ public class BucketBufferPool extends BufferPool {
 	
 	// 预热
 	protected void preheatBucket(int i, int size, int count) {
-		AbstractBucket bucket = new DefaultBucket(this, size, count);
+		AbstractBucket bucket = new ArrayBucket(this, size, count);
 		this._buckets.add(i, bucket);
 	}
 	
 	//根据size寻找 桶
 	private AbstractBucket bucketFor(int size) {
-		if (size <= minChunkSize)
+		if (size > maxChunkSize)
 			return null;
 		//
 		for(int i = 0; i < _buckets.size(); i++) {
@@ -70,11 +75,13 @@ public class BucketBufferPool extends BufferPool {
 		AbstractBucket bucket = bucketFor(size);
 		if ( bucket != null) {
 			byteBuf = bucket.allocate();
+			byteBuf.order( byteOrder );
 		}
 		
 		// 堆内
 		if (byteBuf == null) {
 			byteBuf =  ByteBuffer.allocate( size );
+			byteBuf.order( byteOrder );
 		}
 		return byteBuf;
 

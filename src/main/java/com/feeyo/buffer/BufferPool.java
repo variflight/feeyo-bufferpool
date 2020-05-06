@@ -1,6 +1,7 @@
 package com.feeyo.buffer;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
@@ -18,8 +19,14 @@ public abstract class BufferPool {
 	protected int[] chunkSizes;
 	protected int maxChunkSize;
 	protected int decomposeBufferSize = 64 * 1024;	// 用于大buffer 分解
+	//
+	protected ByteOrder byteOrder;
 	
 	public BufferPool(long minBufferSize, long maxBufferSize, int[] chunkSizes) {
+		this(minBufferSize, maxBufferSize, chunkSizes, ByteOrder.BIG_ENDIAN);
+	}
+	
+	public BufferPool(long minBufferSize, long maxBufferSize, int[] chunkSizes, ByteOrder byteOrder) {
 		this.minBufferSize = minBufferSize;
 		this.maxBufferSize = maxBufferSize;
 		//
@@ -31,6 +38,8 @@ public abstract class BufferPool {
 		this.chunkSizes = chunkSizes;
 		this.minChunkSize = chunkSizes[0];
 		this.maxChunkSize = chunkSizes[ chunkSizes.length - 1 ];
+		//
+		this.byteOrder = byteOrder;
 	}
 	
 	public long getMinBufferSize() {

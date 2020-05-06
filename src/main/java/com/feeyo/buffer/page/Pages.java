@@ -35,6 +35,8 @@ class Pages {
     protected AtomicLong sharedOptsCount = new AtomicLong(0);
     
     //
+	private ByteOrder byteOrder;
+    //
     public Pages(long capacity, int chunkSize) {
     	this.capacity = capacity;
     	this.chunkSize = ( chunkSize < DEFAULT_CHUNK_SIZE ? DEFAULT_CHUNK_SIZE : chunkSize );
@@ -48,7 +50,13 @@ class Pages {
     		this.pageCount = 1;
     	}
     	//
-    	LOGGER.info("Pages initialize, capacity={}, chunkSize={}, pageSize={}, pageCount={} ", capacity, chunkSize, pageSize, pageCount);
+    	this.byteOrder = ByteOrder.BIG_ENDIAN;
+    }
+    
+    
+    public Pages(long capacity, int chunkSize, ByteOrder byteOrder) {
+    	this(capacity, chunkSize);
+    	this.byteOrder = byteOrder;
     }
 	//
 	public void initialize() {
@@ -94,7 +102,7 @@ class Pages {
 			byteBuf = ByteBuffer.allocate(size);
 		}
 		//
-		byteBuf.order( ByteOrder.LITTLE_ENDIAN );
+		byteBuf.order( byteOrder );
 		return byteBuf;
 	}
 	

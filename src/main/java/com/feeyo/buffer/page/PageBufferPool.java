@@ -1,6 +1,7 @@
 package com.feeyo.buffer.page;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,9 +12,13 @@ public class PageBufferPool extends BufferPool {
 	private final Pages pages;
 
 	public PageBufferPool(long minBufferSize, long maxBufferSize, int[] chunkSizes) {
-		super(minBufferSize, maxBufferSize, chunkSizes);
+		this(minBufferSize, maxBufferSize, chunkSizes, ByteOrder.BIG_ENDIAN);
+	}
+	
+	public PageBufferPool(long minBufferSize, long maxBufferSize, int[] chunkSizes, ByteOrder byteOrder) {
+		super(minBufferSize, maxBufferSize, chunkSizes, byteOrder);
 		//
-		this.pages = new Pages(this.maxBufferSize, this.maxChunkSize);
+		this.pages = new Pages(this.maxBufferSize, this.maxChunkSize, byteOrder);
     	this.pages.initialize();
 	}
 
