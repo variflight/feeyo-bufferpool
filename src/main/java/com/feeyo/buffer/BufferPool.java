@@ -18,7 +18,6 @@ public abstract class BufferPool {
 	protected int minChunkSize;
 	protected int[] chunkSizes;
 	protected int maxChunkSize;
-	protected int decomposeBufferSize = 64 * 1024;	// 用于大buffer 分解
 	//
 	protected ByteOrder byteOrder;
 	
@@ -48,10 +47,6 @@ public abstract class BufferPool {
 
 	public long getMaxBufferSize() {
 		return maxBufferSize;
-	}
-	
-	public int getDecomposeBufferSize() {
-		return decomposeBufferSize;
 	}
 
 	public AtomicLong getUsedBufferSize() {
