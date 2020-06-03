@@ -31,22 +31,17 @@ public abstract class AbstractBucket implements Comparable<AbstractBucket> {
         this.count = new AtomicInteger(count);
         this.usedCount = new AtomicInteger(0);
     }
-
+    //
     protected abstract boolean queueOffer(ByteBuffer buffer);
-
     protected abstract ByteBuffer queuePoll();
-
     protected abstract void containerClear();
-
     public abstract int getQueueSize();
 
-    
+    //
     public ByteBuffer allocate() {
-
         ByteBuffer bb = queuePoll();
         if (bb != null) {
         	this.usedCount.incrementAndGet();
-        	//
         	// Clear sets limit == capacity. Position == 0.
             bb.clear();
             return bb;
@@ -54,7 +49,6 @@ public abstract class AbstractBucket implements Comparable<AbstractBucket> {
         //
         // 桶内内存块不足，创建新的块
         synchronized (_lock) {
-        	
             // 容量阀值
             long poolUsed = bufferPool.getUsedBufferSize().get();
             if ((poolUsed + chunkSize) < bufferPool.getMaxBufferSize()) {

@@ -45,10 +45,11 @@ public class BucketBufferPool extends BufferPool {
 		}
 	}
 	
+	///
 	// 预热
-	protected void preheatBucket(int i, int size, int count) {
-		AbstractBucket bucket = new ArrayBucket(this, size, count);
-		this._buckets.add(i, bucket);
+	protected void preheatBucket(int bucketIdx, int chunkSize, int count) {
+		AbstractBucket bucket = new ArrayBucket(this, chunkSize, count);
+		this._buckets.add(bucketIdx, bucket);
 	}
 	
 	//根据size寻找 桶
