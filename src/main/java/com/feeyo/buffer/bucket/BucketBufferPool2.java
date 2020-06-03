@@ -7,9 +7,8 @@ public class BucketBufferPool2 extends BucketBufferPool {
 	}
 	
 	@Override
-	protected void preheatBucket(int bucketIdx, int chunkSize, int count) {
-		AbstractBucket bucket = new DefaultBucket(this, chunkSize, count);
-		this._buckets.add(bucketIdx, bucket);
+	protected void addBucket(int bucketIdx, int chunkSize, int count) {
+		this._buckets.add(bucketIdx, new DefaultBucket(this, chunkSize, count));
 	}
 
 }
