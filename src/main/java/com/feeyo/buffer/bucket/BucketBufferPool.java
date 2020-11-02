@@ -14,9 +14,7 @@ import java.util.Map;
 
 /**
  * 堆外内存池
- * 
  * @author zhuam
- *
  */
 public class BucketBufferPool extends BufferPool {
 	
@@ -42,7 +40,7 @@ public class BucketBufferPool extends BufferPool {
 		}
 	}
 	
-	///
+	//
 	// 构建桶
 	protected void addBucket(int bucketIdx, int chunkSize, int count) {
 		this.buckets.add(bucketIdx, new ArrayBucket(this, chunkSize, count));
@@ -73,14 +71,12 @@ public class BucketBufferPool extends BufferPool {
 			byteBuf = bucket.allocate();
 			byteBuf.order( byteOrder );
 		}
-		
 		// 堆内
 		if (byteBuf == null) {
 			byteBuf =  ByteBuffer.allocate( size );
 			byteBuf.order( byteOrder );
 		}
 		return byteBuf;
-
 	}
 
 	@Override

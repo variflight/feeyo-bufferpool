@@ -10,11 +10,10 @@ import java.util.concurrent.atomic.AtomicLong;
  * 缓冲池
  */
 public abstract class BufferPool {
-	//
 	protected long minBufferSize;
 	protected long maxBufferSize;
 	protected AtomicLong usedBufferSize = new AtomicLong(0); 
-	
+	//
 	protected int minChunkSize;
 	protected int[] chunkSizes;
 	protected int maxChunkSize;
@@ -63,7 +62,6 @@ public abstract class BufferPool {
 	public int getMaxChunkSize() {
 		return maxChunkSize;
 	}
-
 	//
     public abstract ByteBuffer allocate(int size);
     public abstract void recycle(ByteBuffer theBuf);
@@ -73,5 +71,4 @@ public abstract class BufferPool {
     public abstract long getSharedOptsCount();
     //
     public abstract Map<String, Object> getStatistics();
-    
 }
