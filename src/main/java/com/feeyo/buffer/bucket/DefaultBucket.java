@@ -8,7 +8,7 @@ import com.feeyo.buffer.BufferPool;
 public class DefaultBucket extends AbstractBucket {
 	
 	private final ConcurrentLinkedQueue<ByteBuffer> queue = new ConcurrentLinkedQueue<ByteBuffer>();
-
+	
 	public DefaultBucket(BufferPool pool, int chunkSize, int count) {
 		super(pool, chunkSize, count);
 		// 初始化

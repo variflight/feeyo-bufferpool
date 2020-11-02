@@ -16,12 +16,11 @@ public class ArrayBucket extends AbstractBucket {
 	@SuppressWarnings("unchecked")
 	public ArrayBucket(BufferPool pool, int chunkSize, int count) {
 		super(pool, chunkSize, count);
-
+		//
 		this.queueArray = new ConcurrentLinkedQueue[16];
 		for (int i = 0; i < queueArray.length; i++) {
 			this.queueArray[i] = new ConcurrentLinkedQueue<ByteBuffer>();
 		}
-		
 		// 初始化
 		for (int j = 0; j < count; j++) {
 			queueOffer(ByteBuffer.allocateDirect(chunkSize));
