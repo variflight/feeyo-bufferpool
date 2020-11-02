@@ -23,8 +23,8 @@ public class BucketBufferPool extends BufferPool {
 	protected List<AbstractBucket> buckets;
 	protected long sharedOptsCount;
 	
-	public BucketBufferPool(long minBufferSize, long maxBufferSize, int[] bucketSizes) {
-		this(minBufferSize, maxBufferSize, bucketSizes, ByteOrder.BIG_ENDIAN);
+	public BucketBufferPool(long minBufferSize, long maxBufferSize, int[] chunkSizes) {
+		this(minBufferSize, maxBufferSize, chunkSizes, ByteOrder.BIG_ENDIAN);
 	}
 	//
 	public BucketBufferPool(long minBufferSize, long maxBufferSize, int[] chunkSizes, ByteOrder byteOrder) {
