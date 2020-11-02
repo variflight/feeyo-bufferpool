@@ -29,9 +29,8 @@ public abstract class BufferPool {
 		this.minBufferSize = minBufferSize;
 		this.maxBufferSize = maxBufferSize;
 		//
-		if ( chunkSizes == null || chunkSizes.length ==0 )
+		if ( chunkSizes == null || chunkSizes.length == 0 )
 			throw new IllegalArgumentException("chunkSizes cannot be empty!");
-		//
 		Arrays.sort( chunkSizes );
 		//
 		this.chunkSizes = chunkSizes;

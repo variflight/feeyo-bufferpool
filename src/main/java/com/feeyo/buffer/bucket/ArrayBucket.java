@@ -12,8 +12,7 @@ public class ArrayBucket extends AbstractBucket {
 	
 	private final AtomicInteger pollIdx = new AtomicInteger(0);
 	private final AtomicInteger offerIdx = new AtomicInteger(0);
-
-
+	//
 	@SuppressWarnings("unchecked")
 	public ArrayBucket(BufferPool pool, int chunkSize, int count) {
 		super(pool, chunkSize, count);
