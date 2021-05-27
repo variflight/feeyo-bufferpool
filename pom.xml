@@ -20,9 +20,9 @@
    <repository>
      <id>github</id>
      <name>GitHub OWNER Apache Maven Packages</name>
-     <url>https://maven.pkg.github.com/OWNER/REPOSITORY</url>
+     <url>https://maven.pkg.github.com/variflight/feeyo-bufferpool</url>
    </repository>
-</distributionManagement>
+ </distributionManagement>
   
   <!-- 私服配置 -->
   <!-- 
