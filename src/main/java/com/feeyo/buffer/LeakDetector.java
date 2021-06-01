@@ -62,11 +62,11 @@ public class LeakDetector<T> implements Runnable {
 		thread.interrupt();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void run() {
 		try {
-			while ( isRunning.get() ) {
-				@SuppressWarnings("unchecked")
+			while (isRunning.get()) {
 				LeakInfo leakInfo = (LeakInfo) queue.remove();
 				if (LOGGER.isDebugEnabled())
 					LOGGER.debug("Resource GC'ed: {}", leakInfo);
