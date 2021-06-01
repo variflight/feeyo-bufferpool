@@ -3,7 +3,6 @@ package com.feeyo.buffer;
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
@@ -14,19 +13,16 @@ public class LeakDetector<T> implements Runnable {
 	private static final Logger LOGGER = LoggerFactory.getLogger(LeakDetector.class);
 
 	private final ReferenceQueue<T> queue = new ReferenceQueue<>();
-	private final ConcurrentMap<String, LeakInfo> resources = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<String, LeakInfo> resources = new ConcurrentHashMap<>();
 	private Thread thread;
 	private AtomicBoolean isRunning = new AtomicBoolean(false);
-
 	//
 	public boolean acquired(T resource) {
 		String id = id(resource);
 		LeakInfo info = resources.putIfAbsent(id, new LeakInfo(resource, id));
 		if (info != null) {
-			// 检测到泄漏，先前获取存在（未释放）或id冲突
-			return false;
+			return false; // 检测到泄漏，先前获取存在（未释放）或id冲突
 		}
-		//
 		return true;
 	}
 
@@ -36,9 +32,7 @@ public class LeakDetector<T> implements Runnable {
 		if (info != null) {
 			return true;
 		}
-
-		// 检测到泄漏（未获取即释放）
-		return false;
+		return false; // 检测到泄漏（未获取即释放）
 	}
 	
 	//
@@ -46,7 +40,6 @@ public class LeakDetector<T> implements Runnable {
 		return String.valueOf(System.identityHashCode(resource));
 	}
 
-	
 	public void start() throws Exception {
 		if ( !isRunning.compareAndSet(false, true) )
 			return;
@@ -54,7 +47,6 @@ public class LeakDetector<T> implements Runnable {
 		thread.setDaemon(true);
 		thread.start();
 	}
-
 
 	protected void stop() throws Exception {
 		if ( !isRunning.compareAndSet(true, false))

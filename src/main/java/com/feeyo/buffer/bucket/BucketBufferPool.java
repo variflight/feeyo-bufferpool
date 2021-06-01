@@ -1,7 +1,6 @@
 package com.feeyo.buffer.bucket;
 
 import com.feeyo.buffer.BufferPool;
-import com.feeyo.buffer.bucket.ref.ByteBufferReferenceUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,9 +38,6 @@ public class BucketBufferPool extends BufferPool {
 			int chunkCount = (int) (bucketCapacity / chunkSize);
 			this.addBucket(i, chunkSize, chunkCount);
 		}
-		
-		// 引用检测
-		ByteBufferReferenceUtil.referenceCheck(buckets);
 	}
 	
 	//

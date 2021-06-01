@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 public class LeakTrackingBufferPool extends BufferPool {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(LeakTrackingBufferPool.class);
-
 	//
 	private final LeakDetector<ByteBuffer> leakDetector = new LeakDetector<ByteBuffer>() {
 		@Override
@@ -64,7 +63,7 @@ public class LeakTrackingBufferPool extends BufferPool {
 	public ByteBuffer allocate(int size) {
 		ByteBuffer buffer = delegate.allocate(size);
 		boolean leaked = leakDetector.acquired(buffer);
-		if ( !leaked) {
+		if (!leaked) {
 			leakedAcquires.incrementAndGet();
 			LOG.info(String.format("ByteBuffer acquire %s leaked.acquired=%s", leakDetector.id(buffer),
 					leaked ? "normal" : "LEAK"), new Throwable("LeakStack.Acquire"));
