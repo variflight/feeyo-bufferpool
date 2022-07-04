@@ -4,7 +4,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.feeyo.buffer.BufferPool;
+import com.feeyo.buffer.bucket.ref.ByteBufferReference;
+
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class AbstractBucket implements Comparable<AbstractBucket> {
@@ -17,7 +23,8 @@ public abstract class AbstractBucket implements Comparable<AbstractBucket> {
     private final BufferPool bufferPool;
     private final Object _lock = new Object();
     private long _shared = 0;
-
+    
+    private final ConcurrentHashMap<Long, ByteBufferReference> references;
 
     public AbstractBucket(BufferPool pool, int chunkSize) {
         this(pool, chunkSize, 0);
@@ -29,6 +36,7 @@ public abstract class AbstractBucket implements Comparable<AbstractBucket> {
 
         this.count = new AtomicInteger(count);
         this.usedCount = new AtomicInteger(0);
+        this.references = new ConcurrentHashMap<Long, ByteBufferReference>(count, 0.2F, 32);
     }
     //
     protected abstract boolean queueOffer(ByteBuffer buffer);
@@ -40,10 +48,29 @@ public abstract class AbstractBucket implements Comparable<AbstractBucket> {
     public ByteBuffer allocate() {
         ByteBuffer bb = queuePoll();
         if (bb != null) {
-        	this.usedCount.incrementAndGet();
-        	// Clear sets limit == capacity. Position == 0.
-            bb.clear();
-            return bb;
+        	try {
+				long address = ((sun.nio.ch.DirectBuffer) bb).address();
+				ByteBufferReference reference = references.get(address);
+				if (reference == null) {
+					reference = new ByteBufferReference(address, bb);
+					references.put(address, reference);
+				}
+
+				// 检测
+				if (reference.isItAllocatable()) {
+					this.usedCount.incrementAndGet();
+
+					// Clear sets limit == capacity. Position == 0.
+					bb.clear();
+					return bb;
+
+				} else {
+					return null;
+				}
+			} catch (Exception e) {
+				LOGGER.error("allocate err", e);
+				return bb;
+			}
         }
         //
         // 桶内内存块不足，创建新的块
@@ -71,6 +98,24 @@ public abstract class AbstractBucket implements Comparable<AbstractBucket> {
             return;
         }
         
+        try {
+			long address = ((sun.nio.ch.DirectBuffer) buf).address();
+			ByteBufferReference reference = references.get(address);
+			if (reference == null) {
+				reference = new ByteBufferReference(address, buf);
+				references.put(address, reference);
+
+			} else {
+				// 如果不能回收，则返回
+				if (!reference.isItRecyclable()) {
+					return;
+				}
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("recycle err", e);
+		}
+        
         usedCount.decrementAndGet(); 
         
         buf.clear();
@@ -78,6 +123,47 @@ public abstract class AbstractBucket implements Comparable<AbstractBucket> {
         _shared++;
     }
 
+    
+    /**
+	 * 释放超时的 buffer
+	 */
+	public void releaseTimeoutBuffer() {
+
+		List<Long> timeoutAddrs = null;
+
+		for (Entry<Long, ByteBufferReference> entry : references.entrySet()) {
+			ByteBufferReference ref = entry.getValue();
+			if (ref.isTimeout()) {
+
+				if (timeoutAddrs == null)
+					timeoutAddrs = new ArrayList<Long>();
+
+				timeoutAddrs.add(ref.getAddress());
+			}
+		}
+
+		//
+		if (timeoutAddrs != null) {
+			for (long addr : timeoutAddrs) {
+				boolean isRemoved = false;
+				ByteBufferReference addrRef = references.remove(addr);
+				if (addrRef != null) {
+
+					ByteBuffer oldBuffer = addrRef.getByteBuffer();
+					oldBuffer.clear();
+
+					isRemoved = queueOffer(oldBuffer);
+					_shared++;
+					usedCount.decrementAndGet();
+				}
+
+				//
+				LOGGER.warn("##buffer reference release addr:{}, isRemoved:{}", addrRef, isRemoved);
+			}
+		}
+	}
+
+    
   
     @SuppressWarnings("restriction")
     public synchronized void clear() {
