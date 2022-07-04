@@ -162,10 +162,7 @@ public abstract class AbstractBucket implements Comparable<AbstractBucket> {
 			}
 		}
 	}
-
-    
-  
-    @SuppressWarnings("restriction")
+	//
     public synchronized void clear() {
         ByteBuffer buffer;
         while ((buffer = queuePoll()) != null) {
